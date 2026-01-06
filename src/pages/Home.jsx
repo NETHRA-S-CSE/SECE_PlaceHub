@@ -12,6 +12,7 @@ function Home() {
             <li>Student Profile and Resume Management</li>
             <li>Prevents Missing Application Records</li>
             <li>Replaces Manual Tracking of Sudents</li>
+            <li>Efficient shortlisting for placement officers</li>
         </ul>
         </div>
         <Footer />
