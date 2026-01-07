@@ -1,55 +1,70 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-
+import "../styles/main.css";
 function AdminDashboard() {
   return (
     <div>
       <Header />
 
-      <main style={{ padding: "20px" }}>
+      <main>
         <h1>Admin Dashboard</h1>
-        <p>Training & Placement Officer Panel</p>
+        <span className="admin-badge">Training & Placement Officer Panel</span>
 
-        <hr />
+        <div className="dashboard-container">
+          
+          {/* LEFT: Post Announcement */}
+          <div className="dashboard-left">
+            <h2 className="section-title">Post Placement Announcement</h2>
+            <p>
+              Announcements posted here will appear in the Student Newsroom.
+            </p>
 
-        {/* Post Announcement Section */}
-        <h2>Post Placement Announcement</h2>
-        <p>
-          Any updates posted here will be visible to students in the Newsroom
-          section.
-        </p>
+            <div className="form-group">
+              <label>Title</label><br />
+              <input type="text" />
+            </div>
 
-        <label>Title</label><br />
-        <input type="text" style={{ width: "400px" }} /><br /><br />
+            <div className="form-group">
+              <label>Description</label><br />
+              <textarea rows="4"></textarea>
+            </div>
 
-        <label>Description</label><br />
-        <textarea rows="4" cols="60"></textarea><br /><br />
+            <div className="form-group">
+              <label>Registration / Application Link</label><br />
+              <input type="text" />
+            </div>
 
-        <label>Registration / Application Link</label><br />
-        <input type="text" style={{ width: "400px" }} /><br /><br />
+            <div className="form-group">
+              <label>Deadline</label><br />
+              <input type="date" />
+            </div>
 
-        <label>Deadline</label><br />
-        <input type="date" /><br /><br />
+            <button>Post Announcement</button>
+          </div>
 
-        <button>Post Announcement</button>
+          {/* RIGHT: Newsroom Preview */}
+          <div className="dashboard-right">
+            <h2 className="section-title">Newsroom Preview</h2>
 
-        <hr style={{ margin: "30px 0" }} />
+            <div className="card">
+              <h3>Zoho Internship – Summer 2026</h3>
+              <p>
+                Eligible students are requested to apply using the link below.
+              </p>
+              <p><strong>Deadline:</strong> 20 July 2026</p>
+              <a href="#">Apply Here</a>
+            </div>
 
-        {/* Newsroom Preview */}
-        <h2>Newsroom Preview</h2>
+            <div className="card">
+              <h3>TCS CodeVita Registration</h3>
+              <p>
+                Interested students can register for the coding contest.
+              </p>
+              <p><strong>Deadline:</strong> 15 July 2026</p>
+              <a href="#">Register Now</a>
+            </div>
 
-        <div style={{ border: "1px solid #ccc", padding: "15px", marginBottom: "15px" }}>
-          <h3>Zoho Internship – Summer 2026</h3>
-          <p>Eligible students are requested to apply using the link below.</p>
-          <p><strong>Deadline:</strong> 20 July 2026</p>
-          <a href="#">Apply Here</a>
-        </div>
-
-        <div style={{ border: "1px solid #ccc", padding: "15px" }}>
-          <h3>TCS CodeVita Registration</h3>
-          <p>Interested students can register for the coding contest.</p>
-          <p><strong>Deadline:</strong> 15 July 2026</p>
-          <a href="#">Register Now</a>
+          </div>
         </div>
       </main>
 

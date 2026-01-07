@@ -16,20 +16,13 @@ function Profile() {
         <h1>Student Profile</h1>
         <p>Fill all details to complete your placement profile.</p>
 
-        {/* Profile completion tracker */}
-        <div style={{ margin: "20px 0" }}>
-          <p><strong>Profile Completion:</strong> {completionPercent}%</p>
-          <div style={{ width: "100%", backgroundColor: "#ddd", height: "20px" }}>
-            <div
-              style={{
-                width: `${completionPercent}%`,
-                backgroundColor: "#4caf50",
-                height: "20px"
-              }}
-            ></div>
-          </div>
-          <p>{filledFields} out of {totalFields} fields completed</p>
-        </div>
+       <div className="progress-container">
+  <div
+    className="progress-bar"
+    style={{ width: `${completionPercent}%` }}
+  ></div>
+</div>
+
 
         <hr />
 
