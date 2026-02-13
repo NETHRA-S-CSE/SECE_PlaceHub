@@ -17,7 +17,9 @@ function Header() {
         const confirmed = window.confirm("Are you sure you want to logout?");
         if (confirmed) {
             localStorage.removeItem("authData");
-            navigate("/");
+            setAuthData(null);
+            navigate("/", { replace: true });
+            window.location.reload();
         }
     };
 
@@ -27,22 +29,28 @@ function Header() {
     return (
         <>
             <header>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
-                    <div>
-                        <h1>SECE PlaceHub</h1>
-                        <p>A Smart Placement Management & Analytics System</p>
-                    </div>
-                    {authData && !isLoginPage && (
-                        <div style={{ 
+                <div style={{ textAlign: "center" }}>
+                    <h1>SECE PlaceHub</h1>
+                    <p>A Smart Placement Management & Analytics System</p>
+                </div>
+                {authData && !isLoginPage && (
+                    <div style={{ 
+                        display: "flex", 
+                        justifyContent: "center",
+                        alignItems: "center", 
+                        gap: "15px",
+                        marginTop: "15px"
+                    }}>
+                        <div style={{
                             display: "flex", 
                             alignItems: "center", 
                             gap: "15px",
                             padding: "10px 20px",
-                            backgroundColor: "#f8f9fa",
+                            backgroundColor: "rgba(255, 255, 255, 0.15)",
                             borderRadius: "8px",
-                            border: "1px solid #dee2e6"
+                            border: "1px solid rgba(255, 255, 255, 0.3)"
                         }}>
-                            <span style={{ fontWeight: "500", color: "#495057" }}>
+                            <span style={{ fontWeight: "500", color: "#fff" }}>
                                 {authData.role === "admin" ? "👔 " : "🎓 "}
                                 {authData.role === "admin" ? "Placement Officer" : "Student"}
                             </span>
@@ -64,8 +72,8 @@ function Header() {
                                 Logout
                             </button>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </header>
 
             {!isLoginPage && authData && (
@@ -74,14 +82,13 @@ function Header() {
                         <>
                             <Link to="/home">Home</Link>
                             <Link to="/newsroom">NewsRoom</Link>
-                            <Link to="#">Notifications</Link>
+                            <Link to="/notifications">Notifications</Link>
                             <Link to="/profile">Profile</Link>
                         </>
                     ) : (
                         <>
                             <Link to="/admin">Dashboard</Link>
-                            <Link to="#">Reports</Link>
-                            <Link to="#">Settings</Link>
+                            <Link to="/reports">Reports</Link>
                         </>
                     )}
                 </nav>

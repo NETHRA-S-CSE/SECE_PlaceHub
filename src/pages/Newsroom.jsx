@@ -3,161 +3,100 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 function Newsroom() {
-  const [appliedEvents, setAppliedEvents] = useState([]);
-
-  // Load applied events from localStorage when component mounts
-  useEffect(() => {
-    const stored = localStorage.getItem("appliedEvents");
-    if (stored) {
-      setAppliedEvents(JSON.parse(stored));
-    }
-  }, []);
-
-  const events = [
+  const [announcements] = useState([
     {
       id: 1,
-      title: "Zoho Internship – Summer 2026",
-      description: "Eligible students are requested to apply for the Zoho Summer Internship program using the link below.",
-      deadline: "20 July 2026",
-      registrationLink: "https://zoho.com/careers/internship"
+      title: "Placement Orientation 2026",
+      description: "All final year students are requested to attend the mandatory placement orientation session.",
+      date: "15 February 2026",
+      category: "Important"
     },
     {
       id: 2,
-      title: "TCS CodeVita Registration",
-      description: "Students interested in participating in the TCS CodeVita coding contest can register using the link below.",
-      deadline: "15 July 2026",
-      registrationLink: "https://tcs.com/codevita"
+      title: "Resume Building Workshop",
+      description: "Learn how to create an effective resume and cover letter. Industry experts will guide you through the process.",
+      date: "20 February 2026",
+      category: "Training"
     },
     {
       id: 3,
-      title: "Infosys Springboard Internship",
-      description: "Infosys has opened registrations for its Springboard internship program. Interested students can apply.",
-      deadline: "25 July 2026",
-      registrationLink: "https://infosys.com/springboard"
+      title: "Mock Interview Sessions",
+      description: "Register for mock interview sessions to prepare for upcoming placements. Limited slots available.",
+      date: "25 February 2026",
+      category: "Training"
+    },
+    {
+      id: 4,
+      title: "Placement Guidelines 2026",
+      description: "Important guidelines and rules for placement season 2026. All students must read and follow these guidelines.",
+      date: "10 February 2026",
+      category: "Guidelines"
     }
-  ];
-
-  const handleApply = (event) => {
-    // Check if already applied
-    if (appliedEvents.includes(event.id)) {
-      alert("You have already applied for this event!");
-      return;
-    }
-
-    // Show confirmation dialog
-    const confirmed = window.confirm(
-      `Are you sure you want to apply for "${event.title}"?\n\nPlease ensure you have filled your profile with all required details before applying.`
-    );
-
-    if (confirmed) {
-      // Get student profile from localStorage
-      const profileData = localStorage.getItem("studentProfile");
-      
-      if (!profileData) {
-        alert("Please complete your profile before applying to events!");
-        return;
-      }
-
-      const profile = JSON.parse(profileData);
-      
-      // Check if profile is complete
-      const isProfileComplete = profile.year && profile.registerNumber && 
-                               profile.rollNumber && profile.department && 
-                               profile.cgpa && profile.resumeLink;
-      
-      if (!isProfileComplete) {
-        alert("Please complete all fields in your profile before applying!");
-        return;
-      }
-
-      // Store application
-      const application = {
-        eventId: event.id,
-        eventTitle: event.title,
-        studentData: profile,
-        appliedDate: new Date().toISOString()
-      };
-
-      // Get existing applications
-      const existingApplications = JSON.parse(localStorage.getItem("eventApplications") || "[]");
-      existingApplications.push(application);
-      localStorage.setItem("eventApplications", JSON.stringify(existingApplications));
-
-      // Update applied events list
-      const newAppliedEvents = [...appliedEvents, event.id];
-      setAppliedEvents(newAppliedEvents);
-      localStorage.setItem("appliedEvents", JSON.stringify(newAppliedEvents));
-
-      alert(`Successfully applied for "${event.title}"!\n\nYour application has been submitted to the Training & Placement Office.`);
-    }
-  };
+  ]);
 
   return (
     <div>
       <Header />
 
-      <main>
-        <h1>Placement Newsroom</h1>
-        <p>
-          All placement and internship related announcements posted by the
-          Training & Placement Office will appear here.
+      <main style={{ padding: "20px" }}>
+        <h1>📰 Placement Newsroom</h1>
+        <p style={{ fontSize: "16px", marginBottom: "20px" }}>
+          General announcements, guidelines, and training programs for all students
         </p>
 
-        {events.map((event) => (
-          <div className="card" key={event.id}>
-            <h3>{event.title}</h3>
-            <p>{event.description}</p>
-            <p><strong>Deadline:</strong> {event.deadline}</p>
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "15px" }}>
-              <a 
-                href={event.registrationLink} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{
-                  display: "inline-block",
-                  padding: "10px 20px",
-                  backgroundColor: "#007bff",
-                  color: "#fff",
-                  textDecoration: "none",
-                  borderRadius: "5px",
-                  fontWeight: "500",
-                  transition: "background-color 0.3s ease"
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#0056b3"}
-                onMouseLeave={(e) => e.target.style.backgroundColor = "#007bff"}
-              >
-                View Registration Link
-              </a>
-              <button
-                onClick={() => handleApply(event)}
-                disabled={appliedEvents.includes(event.id)}
-                style={{
-                  padding: "10px 20px",
-                  backgroundColor: appliedEvents.includes(event.id) ? "#28a745" : "#ffc107",
-                  color: appliedEvents.includes(event.id) ? "#fff" : "#000",
-                  border: "none",
-                  borderRadius: "5px",
-                  fontWeight: "500",
-                  cursor: appliedEvents.includes(event.id) ? "not-allowed" : "pointer",
-                  transition: "all 0.3s ease",
-                  opacity: appliedEvents.includes(event.id) ? 0.8 : 1
-                }}
-                onMouseEnter={(e) => {
-                  if (!appliedEvents.includes(event.id)) {
-                    e.target.style.backgroundColor = "#e0a800";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!appliedEvents.includes(event.id)) {
-                    e.target.style.backgroundColor = "#ffc107";
-                  }
-                }}
-              >
-                {appliedEvents.includes(event.id) ? "✓ Applied" : "Apply Now"}
-              </button>
+        <div style={{
+          padding: "15px",
+          backgroundColor: "#e7f3ff",
+          border: "1px solid #b3d7ff",
+          borderRadius: "8px",
+          marginBottom: "20px"
+        }}>
+          <strong>ℹ️ Note:</strong> For placement opportunities specific to your eligibility, check the{" "}
+          <a href="/notifications" style={{ color: "#007bff", textDecoration: "underline" }}>
+            Notifications page
+          </a>
+        </div>
+
+        {announcements.map((announcement) => (
+          <div className="card" key={announcement.id} style={{ marginBottom: "20px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "10px" }}>
+              <h3 style={{ margin: 0, color: "#333" }}>{announcement.title}</h3>
+              <span style={{
+                padding: "5px 12px",
+                backgroundColor: 
+                  announcement.category === "Important" ? "#dc3545" :
+                  announcement.category === "Training" ? "#28a745" :
+                  "#007bff",
+                color: "#fff",
+                borderRadius: "5px",
+                fontSize: "14px",
+                fontWeight: "500"
+              }}>
+                {announcement.category}
+              </span>
             </div>
+            
+            <p style={{ marginBottom: "10px" }}>{announcement.description}</p>
+            
+            <p style={{ fontSize: "14px", color: "#666", marginBottom: 0 }}>
+              <strong>📅 Date:</strong> {announcement.date}
+            </p>
           </div>
         ))}
+
+        <div style={{
+          padding: "20px",
+          backgroundColor: "#fff3cd",
+          border: "1px solid #ffc107",
+          borderRadius: "8px",
+          marginTop: "30px",
+          textAlign: "center"
+        }}>
+          <h3 style={{ color: "#856404", marginBottom: "10px" }}>📢 Stay Updated!</h3>
+          <p style={{ color: "#856404", marginBottom: 0 }}>
+            Check this page regularly for important announcements and guidelines from the Training & Placement Office.
+          </p>
+        </div>
       </main>
 
       <Footer />

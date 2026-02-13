@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -26,25 +26,39 @@ function Login() {
     e.preventDefault();
     setError("");
 
-    // Validate credentials
-    if (username === credentials[role].username && password === credentials[role].password) {
-      // Store authentication data
-      const authData = {
-        isAuthenticated: true,
-        role: role,
-        username: username,
-        loginTime: new Date().toISOString()
-      };
-      localStorage.setItem("authData", JSON.stringify(authData));
-
-      // Redirect based on role
-      if (role === "admin") {
+    if (role === "admin") {
+      // Admin login
+      if (username === credentials.admin.username && password === credentials.admin.password) {
+        const authData = {
+          isAuthenticated: true,
+          role: "admin",
+          username: username,
+          loginTime: new Date().toISOString()
+        };
+        localStorage.setItem("authData", JSON.stringify(authData));
         navigate("/admin");
       } else {
-        navigate("/home");
+        setError("Invalid admin credentials!");
       }
     } else {
-      setError("Invalid username or password!");
+      // Student login - check both default and registered users
+      const registeredUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
+      const registeredUser = registeredUsers.find(user => 
+        user.username === username && user.password === password
+      );
+
+      if (registeredUser || (username === credentials.student.username && password === credentials.student.password)) {
+        const authData = {
+          isAuthenticated: true,
+          role: "student",
+          username: username,
+          loginTime: new Date().toISOString()
+        };
+        localStorage.setItem("authData", JSON.stringify(authData));
+        navigate("/home");
+      } else {
+        setError("Invalid username or password!");
+      }
     }
   };
 
@@ -204,6 +218,14 @@ function Login() {
           >
             Login
           </button>
+
+          {role === "student" && (
+            <div style={{ textAlign: "center", marginTop: "15px" }}>
+              <Link to="/register" style={{ color: "#007bff", textDecoration: "none", fontWeight: "500" }}>
+                Don't have an account? Register here
+              </Link>
+            </div>
+          )}
         </form>
 
         {/* Demo Credentials Info */}

@@ -10,6 +10,9 @@ function Profile() {
     department: "",
     cgpa: "",
     resumeLink: "",
+    skills: "",
+    certifications: "",
+    profileVisibility: "public"
   });
 
   const [errors, setErrors] = useState({
@@ -338,6 +341,107 @@ function Profile() {
   </div>
 )}
 <br /><br />
+
+<h2>Skills & Certifications</h2>
+
+<label style={{ fontWeight: "600", fontSize: "16px" }}>Technical Skills</label><br />
+<textarea 
+  placeholder="Enter your technical skills (e.g., Python, Java, React, SQL)"
+  value={formData.skills}
+  onChange={(e) => handleInputChange("skills", e.target.value)}
+  rows="3"
+  style={{
+    width: "100%",
+    maxWidth: "500px",
+    padding: "12px 15px",
+    fontSize: "16px",
+    border: "2px solid #ddd",
+    borderRadius: "8px",
+    marginTop: "8px",
+    outline: "none",
+    transition: "border-color 0.3s ease",
+    fontFamily: "inherit"
+  }}
+  onFocus={(e) => e.target.style.borderColor = "#007bff"}
+  onBlur={(e) => e.target.style.borderColor = "#ddd"}
+/>
+<br /><br />
+
+<label style={{ fontWeight: "600", fontSize: "16px" }}>Certifications (Optional)</label><br />
+<textarea 
+  placeholder="List any certifications you have (e.g., AWS Certified, Oracle Java)"
+  value={formData.certifications}
+  onChange={(e) => handleInputChange("certifications", e.target.value)}
+  rows="3"
+  style={{
+    width: "100%",
+    maxWidth: "500px",
+    padding: "12px 15px",
+    fontSize: "16px",
+    border: "2px solid #ddd",
+    borderRadius: "8px",
+    marginTop: "8px",
+    outline: "none",
+    transition: "border-color 0.3s ease",
+    fontFamily: "inherit"
+  }}
+  onFocus={(e) => e.target.style.borderColor = "#007bff"}
+  onBlur={(e) => e.target.style.borderColor = "#ddd"}
+/>
+<br /><br />
+
+<h2>Profile Visibility</h2>
+<label style={{ fontWeight: "600", fontSize: "16px" }}>Who can see your profile?</label><br />
+<div style={{ display: "flex", gap: "20px", marginTop: "10px" }}>
+  <label style={{
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    padding: "12px 20px",
+    border: "2px solid #ddd",
+    borderRadius: "8px",
+    backgroundColor: formData.profileVisibility === "public" ? "#28a745" : "#fff",
+    color: formData.profileVisibility === "public" ? "#fff" : "#333",
+    transition: "all 0.3s ease",
+    fontWeight: "500"
+  }}>
+    <input
+      type="radio"
+      name="visibility"
+      value="public"
+      checked={formData.profileVisibility === "public"}
+      onChange={(e) => handleInputChange("profileVisibility", e.target.value)}
+      style={{ marginRight: "8px", cursor: "pointer" }}
+    />
+    🌐 Public (Visible to all students)
+  </label>
+  <label style={{
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    padding: "12px 20px",
+    border: "2px solid #ddd",
+    borderRadius: "8px",
+    backgroundColor: formData.profileVisibility === "private" ? "#dc3545" : "#fff",
+    color: formData.profileVisibility === "private" ? "#fff" : "#333",
+    transition: "all 0.3s ease",
+    fontWeight: "500"
+  }}>
+    <input
+      type="radio"
+      name="visibility"
+      value="private"
+      checked={formData.profileVisibility === "private"}
+      onChange={(e) => handleInputChange("profileVisibility", e.target.value)}
+      style={{ marginRight: "8px", cursor: "pointer" }}
+    />
+    🔒 Private (Hidden from students)
+  </label>
+</div>
+<p style={{ fontSize: "14px", color: "#666", marginTop: "10px" }}>
+  Note: Placement officers can view all profiles regardless of visibility setting.
+</p>
+<br />
 
 <button 
   onClick={handleSaveProfile}
