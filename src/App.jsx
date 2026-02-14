@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import AdminDashboard from "./pages/AdminDashboard";
-import Reports from "./pages/Reports";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -85,14 +84,6 @@ function App() {
           element={
             <AdminRoute>
               <AdminDashboard />
-            </AdminRoute>
-          } 
-        />
-        <Route 
-          path="/reports" 
-          element={
-            <AdminRoute>
-              <Reports />
             </AdminRoute>
           } 
         />

@@ -7,6 +7,11 @@ import "../styles/main.css";
 function AdminDashboard() {
   const [applications, setApplications] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [placementDrives, setPlacementDrives] = useState([]);
+  const [notificationForm, setNotificationForm] = useState({
+    selectedDriveId: "",
+    message: ""
+  });
   const [driveForm, setDriveForm] = useState({
     title: "",
     description: "",
@@ -23,6 +28,12 @@ function AdminDashboard() {
       const stored = localStorage.getItem("driveApplications");
       if (stored) {
         setApplications(JSON.parse(stored));
+      }
+
+      // Load all placement drives
+      const drives = localStorage.getItem("placementDrives");
+      if (drives) {
+        setPlacementDrives(JSON.parse(drives));
       }
     };
     loadApplications();
@@ -149,6 +160,45 @@ function AdminDashboard() {
         ? prev.eligibleDepartments.filter(d => d !== dept)
         : [...prev.eligibleDepartments, dept]
     }));
+  };
+
+  const handlePostNotification = (e) => {
+    e.preventDefault();
+
+    if (!notificationForm.selectedDriveId || !notificationForm.message.trim()) {
+      alert("Please select a drive and enter a message!");
+      return;
+    }
+
+    // Find the selected drive
+    const selectedDrive = placementDrives.find(d => d.id === parseInt(notificationForm.selectedDriveId));
+    
+    if (!selectedDrive) {
+      alert("Drive not found!");
+      return;
+    }
+
+    // Create notification
+    const notification = {
+      id: Date.now(),
+      driveId: selectedDrive.id,
+      driveTitle: selectedDrive.title,
+      message: notificationForm.message,
+      postedDate: new Date().toISOString()
+    };
+
+    // Save to localStorage
+    const existingNotifications = JSON.parse(localStorage.getItem("driveNotifications") || "[]");
+    existingNotifications.push(notification);
+    localStorage.setItem("driveNotifications", JSON.stringify(existingNotifications));
+
+    alert(`Notification posted successfully!\n\nAll students who applied for "${selectedDrive.title}" will see this notification.`);
+
+    // Reset form
+    setNotificationForm({
+      selectedDriveId: "",
+      message: ""
+    });
   };
 
   return (
@@ -390,6 +440,196 @@ function AdminDashboard() {
                   </div>
                 ))}
               </>
+            )}
+          </div>
+        </div>
+
+        {/* Post Drive-Specific Notifications Section */}
+        <div style={{ marginTop: "40px" }}>
+          <h2 className="section-title">📨 Post Drive-Specific Notifications</h2>
+          <p style={{ marginBottom: "20px", color: "#495057" }}>
+            Send updates to students who applied for specific placement drives
+          </p>
+
+          <div className="card" style={{ 
+            maxWidth: "800px",
+            border: "2px solid #17a2b8",
+            borderLeft: "5px solid #17a2b8"
+          }}>
+            <form onSubmit={handlePostNotification}>
+              <div className="form-group">
+                <label style={{ 
+                  fontWeight: "600", 
+                  fontSize: "16px",
+                  color: "#333",
+                  marginBottom: "8px",
+                  display: "block"
+                }}>
+                  Select Placement Drive
+                </label>
+                <select
+                  value={notificationForm.selectedDriveId}
+                  onChange={(e) => setNotificationForm({
+                    ...notificationForm,
+                    selectedDriveId: e.target.value
+                  })}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    border: "2px solid #dee2e6",
+                    borderRadius: "8px",
+                    fontSize: "15px",
+                    backgroundColor: "#fff",
+                    cursor: "pointer",
+                    transition: "border-color 0.3s ease"
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = "#17a2b8"}
+                  onBlur={(e) => e.target.style.borderColor = "#dee2e6"}
+                >
+                  <option value="">-- Select a Drive --</option>
+                  {placementDrives.map(drive => {
+                    const applicantCount = applications.filter(app => app.driveId === drive.id).length;
+                    return (
+                      <option key={drive.id} value={drive.id}>
+                        {drive.title} ({applicantCount} applicants)
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label style={{ 
+                  fontWeight: "600", 
+                  fontSize: "16px",
+                  color: "#333",
+                  marginBottom: "8px",
+                  display: "block"
+                }}>
+                  Notification Message
+                </label>
+                <textarea
+                  value={notificationForm.message}
+                  onChange={(e) => setNotificationForm({
+                    ...notificationForm,
+                    message: e.target.value
+                  })}
+                  required
+                  rows="6"
+                  placeholder="Enter the notification message for students who applied to this drive..."
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    border: "2px solid #dee2e6",
+                    borderRadius: "8px",
+                    fontSize: "15px",
+                    fontFamily: "inherit",
+                    resize: "vertical",
+                    lineHeight: "1.6",
+                    transition: "border-color 0.3s ease"
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = "#17a2b8"}
+                  onBlur={(e) => e.target.style.borderColor = "#dee2e6"}
+                />
+                <p style={{ 
+                  fontSize: "13px", 
+                  color: "#6c757d",
+                  marginTop: "5px",
+                  marginBottom: "0"
+                }}>
+                  This notification will be visible only to students who applied for the selected drive.
+                </p>
+              </div>
+
+              <button 
+                type="submit"
+                style={{
+                  width: "100%",
+                  padding: "14px",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  backgroundColor: "#17a2b8",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  marginTop: "10px"
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#138496";
+                  e.target.style.transform = "translateY(-2px)";
+                  e.target.style.boxShadow = "0 4px 12px rgba(23, 162, 184, 0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "#17a2b8";
+                  e.target.style.transform = "translateY(0)";
+                  e.target.style.boxShadow = "none";
+                }}
+              >
+                📤 Send Notification
+              </button>
+            </form>
+
+            {/* Preview of sent notifications */}
+            {notificationForm.selectedDriveId && (
+              <div style={{
+                marginTop: "25px",
+                paddingTop: "20px",
+                borderTop: "2px solid #dee2e6"
+              }}>
+                <h4 style={{ 
+                  color: "#495057",
+                  marginBottom: "15px",
+                  fontSize: "16px"
+                }}>
+                  📋 Previous Notifications for this Drive:
+                </h4>
+                {(() => {
+                  const allNotifications = JSON.parse(localStorage.getItem("driveNotifications") || "[]");
+                  const driveNotifs = allNotifications.filter(
+                    n => n.driveId === parseInt(notificationForm.selectedDriveId)
+                  ).sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
+
+                  if (driveNotifs.length === 0) {
+                    return (
+                      <p style={{ 
+                        color: "#6c757d", 
+                        fontSize: "14px",
+                        fontStyle: "italic"
+                      }}>
+                        No notifications posted yet for this drive.
+                      </p>
+                    );
+                  }
+
+                  return driveNotifs.slice(0, 3).map(notif => (
+                    <div key={notif.id} style={{
+                      padding: "12px",
+                      backgroundColor: "#f8f9fa",
+                      borderRadius: "6px",
+                      marginBottom: "10px",
+                      border: "1px solid #dee2e6"
+                    }}>
+                      <p style={{ 
+                        fontSize: "14px",
+                        marginBottom: "5px",
+                        color: "#495057"
+                      }}>
+                        {notif.message}
+                      </p>
+                      <p style={{ 
+                        fontSize: "12px",
+                        color: "#6c757d",
+                        marginBottom: "0"
+                      }}>
+                        Posted: {new Date(notif.postedDate).toLocaleString()}
+                      </p>
+                    </div>
+                  ));
+                })()}
+              </div>
             )}
           </div>
         </div>

@@ -6,6 +6,7 @@ function Notifications() {
   const [eligibleDrives, setEligibleDrives] = useState([]);
   const [appliedDrives, setAppliedDrives] = useState([]);
   const [studentProfile, setStudentProfile] = useState(null);
+  const [driveNotifications, setDriveNotifications] = useState([]);
 
   useEffect(() => {
     // Load student profile
@@ -18,6 +19,16 @@ function Notifications() {
     // Load applied drives
     const applied = JSON.parse(localStorage.getItem("appliedDrives") || "[]");
     setAppliedDrives(applied);
+
+    // Load drive-specific notifications
+    const allNotifications = JSON.parse(localStorage.getItem("driveNotifications") || "[]");
+    
+    // Filter notifications for drives the student has applied to
+    const relevantNotifications = allNotifications.filter(notification => 
+      applied.includes(notification.driveId)
+    ).sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
+    
+    setDriveNotifications(relevantNotifications);
 
     if (profile) {
       // Filter drives based on eligibility
@@ -82,6 +93,109 @@ function Notifications() {
         <p style={{ fontSize: "16px", marginBottom: "20px" }}>
           Placement and internship opportunities matching your profile
         </p>
+
+        {/* Drive-Specific Notifications Section */}
+        {driveNotifications.length > 0 && (
+          <div style={{ marginBottom: "30px" }}>
+            <h2 style={{ 
+              color: "#0056b3", 
+              fontSize: "22px",
+              marginBottom: "15px",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px"
+            }}>
+              📢 Updates for Your Applied Drives
+            </h2>
+            
+            {driveNotifications.map((notification) => (
+              <div 
+                key={notification.id}
+                className="card" 
+                style={{ 
+                  marginBottom: "15px",
+                  borderLeft: "5px solid #ffc107",
+                  backgroundColor: "#fff9e6",
+                  animation: "fadeIn 0.5s ease"
+                }}
+              >
+                <div style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  marginBottom: "10px"
+                }}>
+                  <h3 style={{ 
+                    margin: 0, 
+                    color: "#856404",
+                    fontSize: "18px",
+                    fontWeight: "700"
+                  }}>
+                    {notification.driveTitle}
+                  </h3>
+                  <span style={{
+                    padding: "4px 10px",
+                    backgroundColor: "#ffc107",
+                    color: "#000",
+                    borderRadius: "5px",
+                    fontSize: "12px",
+                    fontWeight: "600"
+                  }}>
+                    NEW
+                  </span>
+                </div>
+
+                <p style={{ 
+                  fontSize: "15px",
+                  lineHeight: "1.6",
+                  color: "#495057",
+                  marginBottom: "10px",
+                  whiteSpace: "pre-wrap"
+                }}>
+                  {notification.message}
+                </p>
+
+                <div style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingTop: "10px",
+                  borderTop: "1px solid #ffeaa7",
+                  fontSize: "13px",
+                  color: "#856404"
+                }}>
+                  <span>
+                    📅 {new Date(notification.postedDate).toLocaleString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                  <span style={{ fontWeight: "600" }}>
+                    From: Placement Office
+                  </span>
+                </div>
+              </div>
+            ))}
+
+            <hr style={{ 
+              margin: "30px 0",
+              border: "none",
+              borderTop: "2px solid #dee2e6"
+            }} />
+          </div>
+        )}
+
+        {/* Eligible Drives Section */}
+        <h2 style={{ 
+          color: "#0056b3", 
+          fontSize: "22px",
+          marginBottom: "15px"
+        }}>
+          🎯 Available Opportunities
+        </h2>
 
         {!studentProfile ? (
           <div className="card" style={{ 

@@ -15,6 +15,10 @@ function Profile() {
     profileVisibility: "public"
   });
 
+  const [originalData, setOriginalData] = useState({});
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
+
   const [errors, setErrors] = useState({
     registerNumber: "",
     rollNumber: "",
@@ -23,6 +27,23 @@ function Profile() {
   });
 
   const [completionPercent, setCompletionPercent] = useState(0);
+
+  // Load saved profile on mount
+  useEffect(() => {
+    const savedProfile = localStorage.getItem("studentProfile");
+    if (savedProfile) {
+      const profileData = JSON.parse(savedProfile);
+      setFormData(profileData);
+      setOriginalData(profileData);
+      
+      // Check if profile is complete
+      const isComplete = Object.values(profileData).every(field => field !== "");
+      setIsProfileComplete(isComplete);
+      setIsEditMode(!isComplete); // If not complete, enable edit mode by default
+    } else {
+      setIsEditMode(true); // If no profile, enable edit mode
+    }
+  }, []);
 
   // Calculate completion percentage whenever form data changes
   useEffect(() => {
@@ -116,9 +137,30 @@ function Profile() {
 
     // Save profile to localStorage
     localStorage.setItem("studentProfile", JSON.stringify(formData));
+    setOriginalData(formData);
+    setIsProfileComplete(true);
+    setIsEditMode(false);
     
     console.log("Profile Data:", formData);
     alert("Profile saved successfully! You can now apply for placement events.");
+  };
+
+  const handleEditProfile = () => {
+    setIsEditMode(true);
+  };
+
+  const handleCancelEdit = () => {
+    // Restore original data
+    setFormData(originalData);
+    setIsEditMode(false);
+    
+    // Clear any validation errors
+    setErrors({
+      registerNumber: "",
+      rollNumber: "",
+      cgpa: "",
+      resumeLink: "",
+    });
   };
 
   return (
@@ -127,8 +169,44 @@ function Profile() {
       <Header />
 
       <main style={{ padding: "20px" }}>
-        <h1>Student Profile</h1>
-        <p>Fill all details to complete your placement profile.</p>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+          <div>
+            <h1 style={{ marginBottom: "5px" }}>Student Profile</h1>
+            <p style={{ marginBottom: "0" }}>
+              {isProfileComplete && !isEditMode 
+                ? "Your profile is complete. Click Edit to update details." 
+                : "Fill all details to complete your placement profile."}
+            </p>
+          </div>
+          
+          {/* Edit/Save/Cancel Buttons */}
+          {isProfileComplete && !isEditMode && (
+            <button
+              onClick={handleEditProfile}
+              style={{
+                padding: "12px 24px",
+                fontSize: "16px",
+                fontWeight: "600",
+                border: "2px solid #007bff",
+                borderRadius: "8px",
+                backgroundColor: "#fff",
+                color: "#007bff",
+                cursor: "pointer",
+                transition: "all 0.3s ease"
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "#007bff";
+                e.target.style.color = "#fff";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "#fff";
+                e.target.style.color = "#007bff";
+              }}
+            >
+              ✏️ Edit Profile
+            </button>
+          )}
+        </div>
 
        <div className="progress-container">
   <div
@@ -149,44 +227,48 @@ function Profile() {
 
 <label style={{ fontWeight: "600", fontSize: "16px" }}>Year of Study</label><br />
 <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", marginTop: "10px" }}>
-  <label style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "10px 15px", border: "2px solid #ddd", borderRadius: "8px", backgroundColor: formData.year === "I" ? "#007bff" : "#fff", color: formData.year === "I" ? "#fff" : "#333", transition: "all 0.3s ease" }}>
+  <label style={{ display: "flex", alignItems: "center", cursor: isEditMode ? "pointer" : "not-allowed", padding: "10px 15px", border: "2px solid #ddd", borderRadius: "8px", backgroundColor: formData.year === "I" ? "#007bff" : "#fff", color: formData.year === "I" ? "#fff" : "#333", transition: "all 0.3s ease", opacity: isEditMode ? 1 : 0.7 }}>
     <input 
       type="radio" 
       name="year" 
       value="I"
       checked={formData.year === "I"}
       onChange={(e) => handleInputChange("year", e.target.value)}
-      style={{ marginRight: "8px", cursor: "pointer" }}
+      disabled={!isEditMode}
+      style={{ marginRight: "8px", cursor: isEditMode ? "pointer" : "not-allowed" }}
     /> I Year
   </label>
-  <label style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "10px 15px", border: "2px solid #ddd", borderRadius: "8px", backgroundColor: formData.year === "II" ? "#007bff" : "#fff", color: formData.year === "II" ? "#fff" : "#333", transition: "all 0.3s ease" }}>
+  <label style={{ display: "flex", alignItems: "center", cursor: isEditMode ? "pointer" : "not-allowed", padding: "10px 15px", border: "2px solid #ddd", borderRadius: "8px", backgroundColor: formData.year === "II" ? "#007bff" : "#fff", color: formData.year === "II" ? "#fff" : "#333", transition: "all 0.3s ease", opacity: isEditMode ? 1 : 0.7 }}>
     <input 
       type="radio" 
       name="year" 
       value="II"
       checked={formData.year === "II"}
       onChange={(e) => handleInputChange("year", e.target.value)}
-      style={{ marginRight: "8px", cursor: "pointer" }}
+      disabled={!isEditMode}
+      style={{ marginRight: "8px", cursor: isEditMode ? "pointer" : "not-allowed" }}
     /> II Year
   </label>
-  <label style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "10px 15px", border: "2px solid #ddd", borderRadius: "8px", backgroundColor: formData.year === "III" ? "#007bff" : "#fff", color: formData.year === "III" ? "#fff" : "#333", transition: "all 0.3s ease" }}>
+  <label style={{ display: "flex", alignItems: "center", cursor: isEditMode ? "pointer" : "not-allowed", padding: "10px 15px", border: "2px solid #ddd", borderRadius: "8px", backgroundColor: formData.year === "III" ? "#007bff" : "#fff", color: formData.year === "III" ? "#fff" : "#333", transition: "all 0.3s ease", opacity: isEditMode ? 1 : 0.7 }}>
     <input 
       type="radio" 
       name="year" 
       value="III"
       checked={formData.year === "III"}
       onChange={(e) => handleInputChange("year", e.target.value)}
-      style={{ marginRight: "8px", cursor: "pointer" }}
+      disabled={!isEditMode}
+      style={{ marginRight: "8px", cursor: isEditMode ? "pointer" : "not-allowed" }}
     /> III Year
   </label>
-  <label style={{ display: "flex", alignItems: "center", cursor: "pointer", padding: "10px 15px", border: "2px solid #ddd", borderRadius: "8px", backgroundColor: formData.year === "IV" ? "#007bff" : "#fff", color: formData.year === "IV" ? "#fff" : "#333", transition: "all 0.3s ease" }}>
+  <label style={{ display: "flex", alignItems: "center", cursor: isEditMode ? "pointer" : "not-allowed", padding: "10px 15px", border: "2px solid #ddd", borderRadius: "8px", backgroundColor: formData.year === "IV" ? "#007bff" : "#fff", color: formData.year === "IV" ? "#fff" : "#333", transition: "all 0.3s ease", opacity: isEditMode ? 1 : 0.7 }}>
     <input 
       type="radio" 
       name="year" 
       value="IV"
       checked={formData.year === "IV"}
       onChange={(e) => handleInputChange("year", e.target.value)}
-      style={{ marginRight: "8px", cursor: "pointer" }}
+      disabled={!isEditMode}
+      style={{ marginRight: "8px", cursor: isEditMode ? "pointer" : "not-allowed" }}
     /> IV Year
   </label>
 </div>
@@ -199,6 +281,7 @@ function Profile() {
   maxLength="12"
   value={formData.registerNumber}
   onChange={(e) => handleInputChange("registerNumber", e.target.value)}
+  disabled={!isEditMode}
   style={{
     width: "100%",
     maxWidth: "500px",
@@ -208,7 +291,9 @@ function Profile() {
     borderRadius: "8px",
     marginTop: "8px",
     outline: "none",
-    transition: "border-color 0.3s ease"
+    transition: "border-color 0.3s ease",
+    backgroundColor: isEditMode ? "#fff" : "#f8f9fa",
+    cursor: isEditMode ? "text" : "not-allowed"
   }}
   onFocus={(e) => !errors.registerNumber && (e.target.style.borderColor = "#007bff")}
   onBlur={(e) => !errors.registerNumber && (e.target.style.borderColor = "#ddd")}
@@ -228,6 +313,7 @@ function Profile() {
   maxLength="7"
   value={formData.rollNumber}
   onChange={(e) => handleInputChange("rollNumber", e.target.value.toUpperCase())}
+  disabled={!isEditMode}
   style={{
     width: "100%",
     maxWidth: "500px",
@@ -237,7 +323,9 @@ function Profile() {
     borderRadius: "8px",
     marginTop: "8px",
     outline: "none",
-    transition: "border-color 0.3s ease"
+    transition: "border-color 0.3s ease",
+    backgroundColor: isEditMode ? "#fff" : "#f8f9fa",
+    cursor: isEditMode ? "text" : "not-allowed"
   }}
   onFocus={(e) => !errors.rollNumber && (e.target.style.borderColor = "#007bff")}
   onBlur={(e) => !errors.rollNumber && (e.target.style.borderColor = "#ddd")}
@@ -254,6 +342,7 @@ function Profile() {
 <select 
   value={formData.department}
   onChange={(e) => handleInputChange("department", e.target.value)}
+  disabled={!isEditMode}
   required
   style={{
     width: "100%",
@@ -262,8 +351,8 @@ function Profile() {
     fontSize: "16px",
     border: "2px solid #ddd",
     borderRadius: "8px",
-    backgroundColor: "#fff",
-    cursor: "pointer",
+    backgroundColor: isEditMode ? "#fff" : "#f8f9fa",
+    cursor: isEditMode ? "pointer" : "not-allowed",
     marginTop: "8px",
     transition: "border-color 0.3s ease",
     outline: "none"
@@ -292,6 +381,7 @@ function Profile() {
   placeholder="Enter your CGPA (e.g., 8.5)"
   value={formData.cgpa}
   onChange={(e) => handleInputChange("cgpa", e.target.value)}
+  disabled={!isEditMode}
   style={{
     width: "100%",
     maxWidth: "500px",
@@ -301,7 +391,9 @@ function Profile() {
     borderRadius: "8px",
     marginTop: "8px",
     outline: "none",
-    transition: "border-color 0.3s ease"
+    transition: "border-color 0.3s ease",
+    backgroundColor: isEditMode ? "#fff" : "#f8f9fa",
+    cursor: isEditMode ? "text" : "not-allowed"
   }}
   onFocus={(e) => !errors.cgpa && (e.target.style.borderColor = "#007bff")}
   onBlur={(e) => !errors.cgpa && (e.target.style.borderColor = "#ddd")}
@@ -321,6 +413,7 @@ function Profile() {
   placeholder="Paste your Google Drive resume link here"
   value={formData.resumeLink}
   onChange={(e) => handleInputChange("resumeLink", e.target.value)}
+  disabled={!isEditMode}
   style={{ 
     width: "100%", 
     maxWidth: "500px",
@@ -330,7 +423,9 @@ function Profile() {
     borderRadius: "8px",
     marginTop: "8px",
     outline: "none",
-    transition: "border-color 0.3s ease"
+    transition: "border-color 0.3s ease",
+    backgroundColor: isEditMode ? "#fff" : "#f8f9fa",
+    cursor: isEditMode ? "text" : "not-allowed"
   }}
   onFocus={(e) => !errors.resumeLink && (e.target.style.borderColor = "#007bff")}
   onBlur={(e) => !errors.resumeLink && (e.target.style.borderColor = "#ddd")}
@@ -349,6 +444,7 @@ function Profile() {
   placeholder="Enter your technical skills (e.g., Python, Java, React, SQL)"
   value={formData.skills}
   onChange={(e) => handleInputChange("skills", e.target.value)}
+  disabled={!isEditMode}
   rows="3"
   style={{
     width: "100%",
@@ -360,7 +456,10 @@ function Profile() {
     marginTop: "8px",
     outline: "none",
     transition: "border-color 0.3s ease",
-    fontFamily: "inherit"
+    fontFamily: "inherit",
+    backgroundColor: isEditMode ? "#fff" : "#f8f9fa",
+    cursor: isEditMode ? "text" : "not-allowed",
+    resize: "vertical"
   }}
   onFocus={(e) => e.target.style.borderColor = "#007bff"}
   onBlur={(e) => e.target.style.borderColor = "#ddd"}
@@ -372,6 +471,7 @@ function Profile() {
   placeholder="List any certifications you have (e.g., AWS Certified, Oracle Java)"
   value={formData.certifications}
   onChange={(e) => handleInputChange("certifications", e.target.value)}
+  disabled={!isEditMode}
   rows="3"
   style={{
     width: "100%",
@@ -383,7 +483,10 @@ function Profile() {
     marginTop: "8px",
     outline: "none",
     transition: "border-color 0.3s ease",
-    fontFamily: "inherit"
+    fontFamily: "inherit",
+    backgroundColor: isEditMode ? "#fff" : "#f8f9fa",
+    cursor: isEditMode ? "text" : "not-allowed",
+    resize: "vertical"
   }}
   onFocus={(e) => e.target.style.borderColor = "#007bff"}
   onBlur={(e) => e.target.style.borderColor = "#ddd"}
@@ -396,14 +499,15 @@ function Profile() {
   <label style={{
     display: "flex",
     alignItems: "center",
-    cursor: "pointer",
+    cursor: isEditMode ? "pointer" : "not-allowed",
     padding: "12px 20px",
     border: "2px solid #ddd",
     borderRadius: "8px",
     backgroundColor: formData.profileVisibility === "public" ? "#28a745" : "#fff",
     color: formData.profileVisibility === "public" ? "#fff" : "#333",
     transition: "all 0.3s ease",
-    fontWeight: "500"
+    fontWeight: "500",
+    opacity: isEditMode ? 1 : 0.7
   }}>
     <input
       type="radio"
@@ -411,21 +515,23 @@ function Profile() {
       value="public"
       checked={formData.profileVisibility === "public"}
       onChange={(e) => handleInputChange("profileVisibility", e.target.value)}
-      style={{ marginRight: "8px", cursor: "pointer" }}
+      disabled={!isEditMode}
+      style={{ marginRight: "8px", cursor: isEditMode ? "pointer" : "not-allowed" }}
     />
     🌐 Public (Visible to all students)
   </label>
   <label style={{
     display: "flex",
     alignItems: "center",
-    cursor: "pointer",
+    cursor: isEditMode ? "pointer" : "not-allowed",
     padding: "12px 20px",
     border: "2px solid #ddd",
     borderRadius: "8px",
     backgroundColor: formData.profileVisibility === "private" ? "#dc3545" : "#fff",
     color: formData.profileVisibility === "private" ? "#fff" : "#333",
     transition: "all 0.3s ease",
-    fontWeight: "500"
+    fontWeight: "500",
+    opacity: isEditMode ? 1 : 0.7
   }}>
     <input
       type="radio"
@@ -433,7 +539,8 @@ function Profile() {
       value="private"
       checked={formData.profileVisibility === "private"}
       onChange={(e) => handleInputChange("profileVisibility", e.target.value)}
-      style={{ marginRight: "8px", cursor: "pointer" }}
+      disabled={!isEditMode}
+      style={{ marginRight: "8px", cursor: isEditMode ? "pointer" : "not-allowed" }}
     />
     🔒 Private (Hidden from students)
   </label>
@@ -443,34 +550,67 @@ function Profile() {
 </p>
 <br />
 
-<button 
-  onClick={handleSaveProfile}
-  style={{
-    padding: "14px 40px",
-    fontSize: "18px",
-    fontWeight: "600",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-    boxShadow: "0 4px 6px rgba(0, 123, 255, 0.3)",
-    marginTop: "10px"
-  }}
-  onMouseEnter={(e) => {
-    e.target.style.backgroundColor = "#0056b3";
-    e.target.style.transform = "translateY(-2px)";
-    e.target.style.boxShadow = "0 6px 12px rgba(0, 123, 255, 0.4)";
-  }}
-  onMouseLeave={(e) => {
-    e.target.style.backgroundColor = "#007bff";
-    e.target.style.transform = "translateY(0)";
-    e.target.style.boxShadow = "0 4px 6px rgba(0, 123, 255, 0.3)";
-  }}
->
-  Save Profile
-</button>
+{/* Save and Cancel Buttons - Only show when in edit mode */}
+{isEditMode && (
+  <div style={{ display: "flex", gap: "15px", marginTop: "10px" }}>
+    <button 
+      onClick={handleSaveProfile}
+      style={{
+        padding: "14px 40px",
+        fontSize: "18px",
+        fontWeight: "600",
+        backgroundColor: "#28a745",
+        color: "#fff",
+        border: "none",
+        borderRadius: "8px",
+        cursor: "pointer",
+        transition: "all 0.3s ease",
+        boxShadow: "0 4px 6px rgba(40, 167, 69, 0.3)"
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.backgroundColor = "#218838";
+        e.target.style.transform = "translateY(-2px)";
+        e.target.style.boxShadow = "0 6px 12px rgba(40, 167, 69, 0.4)";
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.backgroundColor = "#28a745";
+        e.target.style.transform = "translateY(0)";
+        e.target.style.boxShadow = "0 4px 6px rgba(40, 167, 69, 0.3)";
+      }}
+    >
+      💾 Save Profile
+    </button>
+    
+    {isProfileComplete && (
+      <button 
+        onClick={handleCancelEdit}
+        style={{
+          padding: "14px 40px",
+          fontSize: "18px",
+          fontWeight: "600",
+          backgroundColor: "#fff",
+          color: "#6c757d",
+          border: "2px solid #6c757d",
+          borderRadius: "8px",
+          cursor: "pointer",
+          transition: "all 0.3s ease"
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = "#6c757d";
+          e.target.style.color = "#fff";
+          e.target.style.transform = "translateY(-2px)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = "#fff";
+          e.target.style.color = "#6c757d";
+          e.target.style.transform = "translateY(0)";
+        }}
+      >
+        ❌ Cancel
+      </button>
+    )}
+  </div>
+)}
 
       </main>
 

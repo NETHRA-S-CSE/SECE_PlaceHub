@@ -88,7 +88,6 @@ function Header() {
                     ) : (
                         <>
                             <Link to="/admin">Dashboard</Link>
-                            <Link to="/reports">Reports</Link>
                         </>
                     )}
                 </nav>
