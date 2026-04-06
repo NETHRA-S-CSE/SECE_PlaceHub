@@ -1,0 +1,27 @@
+{
+  "name": "placehub",
+  "version": "1.0.0",
+  "description": "PlaceHub - Placement Management System",
+  "main": "backend/server.js",
+  "scripts": {
+    "dev": "npm run dev --workspace=frontend & npm start --workspace=backend",
+    "backend": "npm start --workspace=backend",
+    "frontend": "npm run dev --workspace=frontend",
+    "install-all": "npm install && npm install --workspace=backend && npm install --workspace=frontend"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "keywords": [
+    "MERN",
+    "placement",
+    "management",
+    "react",
+    "node",
+    "express",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "MIT"
+}
